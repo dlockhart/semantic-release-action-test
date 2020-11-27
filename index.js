@@ -1,2 +1,2 @@
 // this is a foo
-export const foo = 'testing 123';
+export const foo = 'testing';
