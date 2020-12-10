@@ -20,4 +20,6 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test Output
-        run: echo release ${{ steps.semantic-release.outputs.RELEASE }} 
+        run: |
+          echo release ${{ steps.semantic-release.outputs.RELEASE }}
+          echo version ${{ steps.semantic-release.outputs.VERSION }} 
