@@ -18,6 +18,8 @@ jobs:
         id: semantic-release
         uses: ./.github/actions/semantic-release
         with:
+          DRY_RUN: true
+          DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test Output
         run: |
