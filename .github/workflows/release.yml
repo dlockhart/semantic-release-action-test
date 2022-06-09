@@ -15,7 +15,7 @@ jobs:
         uses: Brightspace/third-party-actions@actions/setup-node
       - name: Get Repo's Last LMS Release
         id: repo-lms-version
-        run: echo "::set-output name=value::$(cat .lms-release)"
+        run: echo "::set-output name=value::$(cat .lmsrelease)"
       - name: Get Active LMS Release
         id: get-lms-version
         uses: Brightspace/lms-version-actions/get-lms-release@main
@@ -25,14 +25,14 @@ jobs:
         if: steps.repo-lms-version.outputs.VALUE != steps.get-lms-version.outputs.LMS_VERSION
         run: |
           echo "Updating last LMS release..."
-          echo "${{ steps.get-lms-version.outputs.LMS_VERSION }}" > .lms-release
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add .lms-release
+          echo "${{ steps.get-lms-version.outputs.LMS_VERSION }}" > .lmsrelease
+          #git config user.name github-actions[bot]
+          #git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .lmsrelease
           git commit -m "feat: updating tracked LMS release version [skip ci]"
           git push --follow-tags --repo=https://${{ inputs.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         env:
-          GITHUB_TOKEN: ${{ secrets.D2L_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Semantic Release
         id: semantic-release
         uses: ./.github/actions/semantic-release
