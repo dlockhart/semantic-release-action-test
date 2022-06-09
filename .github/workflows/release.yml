@@ -25,7 +25,14 @@ jobs:
         if: steps.repo-lms-version.outputs.VALUE != steps.get-lms-version.outputs.LMS_VERSION
         run: |
           echo "Updating last LMS release..."
-          echo "${{ steps.repo-lms-version.outputs.VALUE }}|${{ steps.get-lms-version.outputs.LMS_VERSION }}"
+          echo "${{ steps.get-lms-version.outputs.LMS_VERSION }}" > .lms-release
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .lms-release
+          git commit "Updating tracked LMS release version [skip ci]"
+          git push --follow-tags --repo=https://${{ inputs.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.D2L_GITHUB_TOKEN }}
       - name: Semantic Release
         id: semantic-release
         uses: ./.github/actions/semantic-release
