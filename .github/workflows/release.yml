@@ -2,10 +2,9 @@ name: Release
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   release:
-    if: "!contains(github.event.head_commit.message, 'skip ci')"
     name: Release
     timeout-minutes: 5
     runs-on: ubuntu-latest
@@ -14,10 +13,18 @@ jobs:
         uses: Brightspace/third-party-actions@actions/checkout
       - name: Setup Node
         uses: Brightspace/third-party-actions@actions/setup-node
+      - name: Get Repo's Last LMS Release
+        run: echo "::set-output name=release::$(cat .lms-release)"
+      - name: Get Active LMS Release
+        id: get-lms-version
+        uses: Brightspace/lms-version-actions/get-lms-release@main
+        with:
+          RALLY_API_KEY: ${{ secrets.RALLY_API_KEY }}
       - name: Semantic Release
         id: semantic-release
         uses: ./.github/actions/semantic-release
         with:
+          DRY_RUN: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test Output
         run: |
