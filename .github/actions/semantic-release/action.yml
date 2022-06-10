@@ -49,6 +49,7 @@ runs:
         echo ${{ inputs.DRY_RUN }}
         echo ${{ steps.repo-lms-version.outputs.VALUE }}
         echo ${{ steps.get-lms-version.outputs.LMS_VERSION }}
+      shell: bash
     - name: Update Repo's Last LMS Release
       if: ${{ inputs.MINOR_RELEASE_WITH_LMS == true && inputs.DRY_RUN == false && steps.repo-lms-version.outputs.VALUE != steps.get-lms-version.outputs.LMS_VERSION }}
       run: |
