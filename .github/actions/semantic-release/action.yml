@@ -11,13 +11,15 @@ inputs:
     description: Token to use to update version in 'package.json' and create GitHub release
     required: true
   MINOR_RELEASE_WITH_LMS:
-    description: Will automatically do a minor release whenever the LMS release changes
+    description: Will automatically do a minor release whenever the LMS release changes (requires RALLY_API_KEY)
     default: false
   NPM:
     description: Whether or not to release as an NPM package
     default: false
   NPM_TOKEN:
     description: Token to publish to NPM
+  RALLY_API_KEY:
+    description: Key to access the Rally API, required when MINOR_RELEASE_WITH_LMS is true
 outputs:
   VERSION:
     description: Version of the new release
@@ -36,12 +38,13 @@ runs:
       if: ${{ inputs.MINOR_RELEASE_WITH_LMS }}
       id: repo-lms-version
       run: echo "::set-output name=value::$(cat .lmsrelease)"
+      shell: bash
     - name: Get Active LMS Release
       if: ${{ inputs.MINOR_RELEASE_WITH_LMS }}
       id: get-lms-version
       uses: Brightspace/lms-version-actions/get-lms-release@main
       with:
-        RALLY_API_KEY: ${{ secrets.RALLY_API_KEY }}
+        RALLY_API_KEY: ${{ inputs.RALLY_API_KEY }}
     - name: Update Repo's Last LMS Release
       if: ${{ inputs.MINOR_RELEASE_WITH_LMS && inputs.DRY_RUN == false && steps.repo-lms-version.outputs.VALUE != steps.get-lms-version.outputs.LMS_VERSION }}
       run: |
@@ -53,7 +56,8 @@ runs:
         git commit -m "feat: updating tracked LMS release version [skip ci]"
         git push --follow-tags --repo=https://$GITHUB_TOKEN@github.com/${{ github.repository }}
       env:
-        GITHUB_TOKEN: ${{ secrets.D2L_GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.D2L_GITHUB_TOKEN }}
+      shell: bash
     - name: Create semantic-release configuration
       run: |
         if [ ${{ !contains(github.event.head_commit.message, 'skip ci') }} == true ]; then
