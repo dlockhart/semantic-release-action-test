@@ -43,6 +43,12 @@ runs:
       uses: Brightspace/lms-version-actions/get-lms-release@main
       with:
         RALLY_API_KEY: ${{ inputs.RALLY_API_KEY }}
+    - name: Debug
+      run: |
+        echo ${{ inputs.MINOR_RELEASE_WITH_LMS }}
+        echo ${{ inputs.DRY_RUN }}
+        echo ${{ steps.repo-lms-version.outputs.VALUE }}
+        echo ${{ steps.get-lms-version.outputs.LMS_VERSION }}
     - name: Update Repo's Last LMS Release
       if: ${{ inputs.MINOR_RELEASE_WITH_LMS == true && inputs.DRY_RUN == false && steps.repo-lms-version.outputs.VALUE != steps.get-lms-version.outputs.LMS_VERSION }}
       run: |
