@@ -28,11 +28,10 @@ runs:
   using: composite
   steps:
     - name: Installing semantic-release
+      if: ${{ !contains(github.event.head_commit.message, 'skip ci') == false }}
       run: |
-        if [ ${{ !contains(github.event.head_commit.message, 'skip ci') }} == true ]; then
-          echo "Installing semantic-release..."
-          npm install semantic-release@17 @semantic-release/git@9 --no-save
-        fi
+        echo "Installing semantic-release..."
+        npm install semantic-release@17 @semantic-release/git@9 --no-save
       shell: bash
     - name: Get Repo's Last LMS Release
       if: ${{ inputs.MINOR_RELEASE_WITH_LMS == true }}
