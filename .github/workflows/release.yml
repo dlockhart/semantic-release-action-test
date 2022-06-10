@@ -19,6 +19,7 @@ jobs:
         with:
           DRY_RUN: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RALLY_API_KEY: ${{ secrets.RALLY_API_KEY }}
       - name: Test Output
         run: |
           echo version: ${{ steps.semantic-release.outputs.VERSION }} 
