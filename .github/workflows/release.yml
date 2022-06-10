@@ -19,7 +19,6 @@ jobs:
         with:
           DRY_RUN: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MINOR_RELEASE_WITH_LMS: true
           RALLY_API_KEY: ${{ secrets.RALLY_API_KEY }}
       - name: Test Output
         run: |
