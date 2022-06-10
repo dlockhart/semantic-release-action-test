@@ -10,6 +10,9 @@ inputs:
   GITHUB_TOKEN:
     description: Token to use to update version in 'package.json' and create GitHub release
     required: true
+  MINOR_RELEASE_WITH_LMS:
+    description: Will automatically do a minor release whenever the LMS release changes
+    default: false
   NPM:
     description: Whether or not to release as an NPM package
     default: false
@@ -29,6 +32,28 @@ runs:
           npm install semantic-release@17 @semantic-release/git@9 --no-save
         fi
       shell: bash
+    - name: Get Repo's Last LMS Release
+      if: ${{ inputs.MINOR_RELEASE_WITH_LMS }}
+      id: repo-lms-version
+      run: echo "::set-output name=value::$(cat .lmsrelease)"
+    - name: Get Active LMS Release
+      if: ${{ inputs.MINOR_RELEASE_WITH_LMS }}
+      id: get-lms-version
+      uses: Brightspace/lms-version-actions/get-lms-release@main
+      with:
+        RALLY_API_KEY: ${{ secrets.RALLY_API_KEY }}
+    - name: Update Repo's Last LMS Release
+      if: ${{ inputs.MINOR_RELEASE_WITH_LMS && inputs.DRY_RUN == false && steps.repo-lms-version.outputs.VALUE != steps.get-lms-version.outputs.LMS_VERSION }}
+      run: |
+        echo "Updating last LMS release..."
+        echo "${{ steps.get-lms-version.outputs.LMS_VERSION }}" > .lmsrelease
+        git config user.name github-actions[bot]
+        git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+        git add .lmsrelease
+        git commit -m "feat: updating tracked LMS release version [skip ci]"
+        git push --follow-tags --repo=https://$GITHUB_TOKEN@github.com/${{ github.repository }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.D2L_GITHUB_TOKEN }}
     - name: Create semantic-release configuration
       run: |
         if [ ${{ !contains(github.event.head_commit.message, 'skip ci') }} == true ]; then
